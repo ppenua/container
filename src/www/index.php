@@ -1,5 +1,6 @@
 <?php
 echo phpinfo();die;
+
 //连接本地的 Redis 服务
 $redis = new Redis();
 $redis->connect('redis', 6379);
