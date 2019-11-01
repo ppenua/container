@@ -2,5 +2,3 @@
 logs/nginx/*.log
 logs/php/*.log
 logs/mysql/*.log
-src/code/*
-!src/code/.gitkeep
