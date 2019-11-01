@@ -1,0 +1,6 @@
+.idea
+logs/nginx/*.log
+logs/php/*.log
+logs/mysql/*.log
+src/www/
+src/code/

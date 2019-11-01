@@ -1,0 +1,89 @@
+version: "3"
+services:
+    nginx:
+        image: ${NGINX_IMAGE}
+        ports:
+        - "${NGINX_HTTP_HOST_PORT}:80"
+        - "${NGINX_HTTPS_HOST_PORT}:443"
+        depends_on:
+            - php
+        volumes:
+            - ${SOURCE_WWW_DIR}:/usr/local/www/:rw
+            - ${NGINX_CONFD_DIR}:/etc/nginx/conf.d/:rw
+            - ${NGINX_CONF_FILE}:/etc/nginx/nginx.conf:ro
+            - ${NGINX_LOG_DIR}:/var/log/nginx/:rw
+        environment:
+            TZ: ${TIMEZONE}
+        networks:
+            - app-nginx-php
+        restart: always
+        container_name: nginx
+
+    php:
+        build:
+            context: ./php
+            dockerfile: Dockerfile
+            args:
+                PHP_IMAGE: ${PHP_IMAGE}
+                ALPINE_REPOSITORIES: ${ALPINE_REPOSITORIES}
+                PHP_CORE_EXT: ${PHP_CORE_EXT}
+                PHP_OTHER_EXT: ${PHP_OTHER_EXT}
+                PHP_FPM_USER: ${PROCESS_USER_NAME}
+                PHP_FPM_USER_ID: ${PROCESS_USER_ID}
+                PHP_FPM_GROUP: ${PROCESS_GROUP_NAME}
+                PHP_FPM_GROUP_ID: ${PROCESS_GROUP_ID}
+                TIMEZONE: ${TIMEZONE}
+        volumes:
+            - ${SOURCE_WWW_DIR}:/usr/local/www/:rw
+            - ${PHP_PHP_CONF_FILE}:/usr/local/etc/php/php.ini:ro
+            - ${PHP_FPM_CONF_FILE}:/usr/local/etc/php-fpm.d/www.conf:rw
+            - ${PHP_LOG_DIR}:/var/log/php
+        container_name: php-fpm
+        restart: always
+        expose:
+            - "9000"
+        cap_add:
+            - SYS_PTRACE
+        networks:
+            - app-nginx-php
+
+    mysql:
+        image: ${MYSQL_IMAGE}
+        ports:
+            - "${MYSQL_HOST_PORT}:3306"
+        volumes:
+            - ${MYSQL_CONF_MYSQL}:/etc/mysql/conf.d/mysql.cnf:ro
+            - ${MYSQL_CONF_MY}:/etc/mysql/my.cn:ro
+            - ${MYSQL_LOG_DIR}:/var/run/mysqld/log/:rw
+            - mysql-data:/var/lib/mysql/:rw
+        restart: always
+        networks:
+            - app-nginx-php
+        expose:
+            - "3306"
+        container_name: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+            TZ: ${TIMEZONE}
+
+    redis:
+        image: ${REDIS_IMAGE}
+        volumes:
+            - ${REDIS_CONF_FILE}:/etc/redis.conf:ro
+        restart: always
+        entrypoint: ["redis-server", "/etc/redis.conf"]
+        sysctls:
+            net.core.somaxconn: 1024
+        environment:
+            TZ: ${TIMEZONE}
+        expose:
+            - "6379"
+        container_name: redis
+        networks:
+            - app-nginx-php
+networks:
+    app-nginx-php:  
+        driver: bridge
+volumes:
+    mysql-data:
+        driver: local
