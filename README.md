@@ -1,37 +1,37 @@
 # container
 
 #### 介绍
-docker 容器
-
-#### 软件架构
-软件架构说明
-
+docker-compose 管理的多容器服务 （nginx+php+mysql+redis）
 
 #### 安装教程
+非 `root` 用户启动 需要修改 `.env` 
+```shell
+#### 进程用户
+PROCESS_USER_NAME=user
+PROCESS_USER_ID=501
+PROCESS_GROUP_NAME=staff
+PROCESS_GROUP_ID=250
+```
+否则会产生 写权限问题
 
-1. xxxx
-2. xxxx
-3. xxxx
+`docker-compose up -d`
 
-#### 使用说明
+#### windows
+修改 php/Dockerfile 中  
 
-1. xxxx
-2. xxxx
-3. xxxx
+`sh install.sh && \` -> `dos2unix && sh install.sh &&\`
 
-#### 参与贡献
+#### 使用 composer
+已经集成在 `php` 容器内
+```
+curl -sS https://getcomposer.org/installer | php && \
+mv composer.phar /usr/local/bin/composer && \
+```
 
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
+#### 添加快捷指令
+在 ~/.bash_profile 文件中加上  
+`alias dphp='docker exec -it php-fpm /bin/sh'`  
 
+执行
+`source .bash_profile`
 
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
